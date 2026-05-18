@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Search, Menu, Star, Clock, SlidersHorizontal, ShoppingBag, Plus, Minus,
   Trash2, CheckCircle2, ArrowRight, CreditCard, Lock, MessageSquare, Utensils,
@@ -201,6 +201,23 @@ export default function ImperialFoodWebpage() {
   const [selectedArea, setSelectedArea] = useState(null);
   const [nfcItems, setNfcItems] = useState([nfcSampleItems[0], nfcSampleItems[1]]);
   const [nfcPaid, setNfcPaid] = useState(false);
+  const [showNfcConnect, setShowNfcConnect] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("nfc") === "true") {
+      setMainMode("nfc");
+      setNfcView("tray");
+      setShowNfcConnect(true);
+
+      const timer = setTimeout(() => {
+        setShowNfcConnect(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
@@ -288,6 +305,27 @@ export default function ImperialFoodWebpage() {
       </section>
     </main>
     <MobileNav mainMode={mainMode} onlineView={onlineView} nfcView={nfcView} setOnlineView={setOnlineView} setNfcView={setNfcView} itemCount={itemCount} nfcCount={nfcItems.length} />
+
+    <AnimatePresence>
+      {showNfcConnect && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed left-1/2 top-6 z-[100] w-[calc(100%-2rem)] max-w-md -translate-x-1/2"
+        >
+          <div className="flex items-center gap-3 rounded-3xl bg-[#003E74] px-5 py-4 text-white shadow-2xl">
+            <div className="rounded-full bg-white/20 p-2">
+              <Nfc className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-black">Successfully connected to smart tray</p>
+              <p className="text-xs text-blue-100">NFC session started</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
 
     <AnimatePresence>{selectedArea && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-5 backdrop-blur-sm"><motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="w-full max-w-3xl rounded-[2rem] bg-white p-6 shadow-2xl"><div className="mb-5 flex items-start justify-between gap-4"><div><p className="text-sm font-black text-[#003E74]">Seat availability</p><h2 className="text-3xl font-black">{selectedArea.name}</h2><p className="mt-1 text-sm text-slate-500">{selectedArea.description} · {getAvailableSeats(selectedArea)} seats available</p></div><button onClick={() => setSelectedArea(null)} className="rounded-full border border-[#E8D8B8] p-2 hover:bg-[#F5F7FA]"><X className="h-5 w-5" /></button></div><SeatGrid area={selectedArea} large /><button onClick={() => setSelectedArea(null)} className="mt-6 h-12 w-full rounded-full bg-[#FFC72C] font-black text-slate-950 hover:bg-[#E5A900]">Done</button></motion.div></motion.div>}</AnimatePresence>
     <AnimatePresence>{showPayment && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-5 backdrop-blur-sm"><motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-2xl"><div className="flex items-center justify-between"><div><p className="text-sm font-black text-[#003E74]">Test payment</p><h2 className="text-3xl font-black">Checkout</h2></div><div className="rounded-full bg-[#F5F7FA] p-3 text-[#003E74]"><Lock className="h-6 w-6" /></div></div><div className="mt-6 rounded-3xl bg-[#FFC72C] p-5 text-slate-950"><p className="text-sm text-slate-600">Imperial Food Card</p><p className="mt-6 text-xl font-black tracking-[0.25em]">4242 4242 4242 4242</p><div className="mt-5 flex justify-between text-sm"><span>TEST USER</span><span>12/30</span></div></div><div className="mt-5 space-y-3"><div className="flex justify-between text-sm"><span className="text-slate-500">Payment type</span><span className="font-black">{paymentMode === "nfc" ? "NFC tray" : "Online order"}</span></div><div className="flex justify-between text-sm"><span className="text-slate-500">Amount</span><span className="font-black">£{total.toFixed(2)}</span></div>{paymentMode === "online" && <div className="flex justify-between text-sm"><span className="text-slate-500">Reserved pickup</span><span className="font-black">Today {pickupTime}</span></div>}<div className="flex items-center gap-2 rounded-2xl bg-green-50 p-3 text-sm font-bold text-green-700"><ShieldCheck className="h-5 w-5" /> This is a simulated payment for testing only.</div></div><div className="mt-6 flex gap-3"><button onClick={() => setShowPayment(false)} className="h-12 flex-1 rounded-full border border-[#E8D8B8] font-black text-slate-700 hover:bg-[#F5F7FA]">Cancel</button><button onClick={completePayment} className="h-12 flex-1 rounded-full bg-[#FFC72C] font-black text-slate-950 hover:bg-[#E5A900]">Pay now</button></div></motion.div></motion.div>}</AnimatePresence>
