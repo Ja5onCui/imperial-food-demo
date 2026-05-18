@@ -312,16 +312,20 @@ export default function ImperialFoodWebpage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="fixed left-1/2 top-6 z-[100] w-[calc(100%-2rem)] max-w-md -translate-x-1/2"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/35 px-5 backdrop-blur-sm"
         >
-          <div className="flex items-center gap-3 rounded-3xl bg-[#003E74] px-5 py-4 text-white shadow-2xl">
-            <div className="rounded-full bg-white/20 p-2">
-              <Nfc className="h-5 w-5" />
+          <div className="w-full max-w-sm rounded-[2rem] bg-white p-6 text-center shadow-2xl ring-1 ring-[#E8D8B8]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#FFC72C] text-slate-950">
+              <Nfc className="h-8 w-8" />
             </div>
-            <div>
-              <p className="text-sm font-black">Successfully connected to smart tray</p>
-              <p className="text-xs text-blue-100">NFC session started</p>
-            </div>
+            <p className="mt-4 text-xl font-black text-slate-950">Successfully connected to smart tray</p>
+            <p className="mt-2 text-sm text-slate-500">NFC session started</p>
+            <button
+              onClick={() => setShowNfcConnect(false)}
+              className="mt-5 w-full rounded-full bg-[#003E74] px-5 py-3 font-black text-white"
+            >
+              Continue
+            </button>
           </div>
         </motion.div>
       )}
