@@ -271,7 +271,6 @@ export default function ImperialFoodWebpage() {
   const params = new URLSearchParams(window.location.search);
 
   if (params.get("nfc") === "true") {
-    setScreen("nfcTray");
     setHistory([]);
     setShowNfcConnect(true);
     setTrayBound(true);
