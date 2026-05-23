@@ -24,6 +24,7 @@ import {
   Star,
   Store,
   Trash2,
+  User,
   Utensils,
   WalletCards,
   X,
@@ -250,11 +251,18 @@ export default function ImperialFoodWebpage() {
   const [showNfcConnect, setShowNfcConnect] = useState(false);
   const [trayBound, setTrayBound] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const [screenData, setScreenData] = useState(null);
   const [localReviews, setLocalReviews] = useState({});
   const [reviewName, setReviewName] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
+  const [balance, setBalance] = useState(100);
+  const [showTopUp, setShowTopUp] = useState(false);
+  const [pendingTopUp, setPendingTopUp] = useState(null);
+  const [likedMeals, setLikedMeals] = useState([]);
+  const [showCommentPopup, setShowCommentPopup] = useState(false);
+  const [selectedCommentMeal, setSelectedCommentMeal] = useState(null);
+  const [tempComment, setTempComment] = useState("");
+  const [tempRating, setTempRating] = useState(5);
 
   function go(next) {
     setHistory((prev) => [...prev, screen]);
@@ -336,6 +344,16 @@ export default function ImperialFoodWebpage() {
   return <div className="min-h-screen bg-white text-slate-950">
     <header className="sticky top-0 z-30 border-b border-[#E8D8B8] bg-white/95 px-4 py-3 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between">
+        <div>
+  <h1 className="text-xl font-black tracking-tight text-[#003E74]">
+    IMPERIAL FOOD
+  </h1>
+
+  <p className="text-xs text-slate-500">
+    Smart Cafeteria System
+  </p>
+</div>
+<div className="relative flex items-center gap-3">
         <div className="relative flex items-center gap-3">
 
   <div
@@ -363,7 +381,10 @@ export default function ImperialFoodWebpage() {
       <div className="space-y-3">
 
         <button
-          onClick={() => setScreenData("balance")}
+          onClick={() => {
+  setScreen("balance");
+  setShowAccountMenu(false);
+}}
           className="w-full rounded-2xl bg-[#F8F5EE] p-4 text-left transition hover:bg-[#EFE8D8]"
         >
           <h3 className="font-black text-[#003E74]">Account Balance</h3>
@@ -371,7 +392,10 @@ export default function ImperialFoodWebpage() {
         </button>
 
         <button
-          onClick={() => setScreenData("history")}
+          onClick={() => {
+  setScreen("history");
+  setShowAccountMenu(false);
+}}
           className="w-full rounded-2xl bg-[#F8F5EE] p-4 text-left transition hover:bg-[#EFE8D8]"
         >
           <h3 className="font-black text-[#003E74]">Purchase History</h3>
@@ -379,7 +403,10 @@ export default function ImperialFoodWebpage() {
         </button>
 
         <button
-          onClick={() => setScreenData("favourite")}
+          onClick={() => {
+  setScreen("favourite");
+  setShowAccountMenu(false);
+}}
           className="w-full rounded-2xl bg-[#F8F5EE] p-4 text-left transition hover:bg-[#EFE8D8]"
         >
           <h3 className="font-black text-[#003E74]">Favourite Meal</h3>
@@ -390,32 +417,7 @@ export default function ImperialFoodWebpage() {
     </div>
   )}
 </div>
-        <div className="flex items-center gap-3">
-
-  <div
-    className={`flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black transition-all
-    ${
-      trayBound
-        ? "bg-green-100 text-green-700 ring-2 ring-green-300"
-        : "bg-slate-100 text-slate-500"
-    }`}
-  >
-    <Nfc className="h-4 w-4" />
-    {trayBound ? "Tray Connected" : "No Tray"}
-  </div>
-
-  <button
-    onClick={() => go("onlineCart")}
-    className="relative rounded-full border border-[#E8D8B8] bg-white p-2"
-  >
-    <ShoppingBag className="h-5 w-5" />
-
-    {itemCount > 0 && (
-      <span className="absolute -right-1 -top-1 rounded-full bg-[#FFC72C] px-1.5 text-xs font-black">
-        {itemCount}
-      </span>
-    )}
-  </button>
+      
 
 </div>
       </div>
@@ -465,7 +467,7 @@ export default function ImperialFoodWebpage() {
             <div className="rounded-3xl bg-[#F5F7FA] p-4"><div className="flex justify-between text-sm text-slate-600"><span>Detection mode</span><span className="font-black text-slate-950">NFC / QR backup</span></div><div className="mt-2 flex justify-between text-sm text-slate-600"><span>Subtotal</span><span className="font-black text-slate-950">£{nfcTotal.toFixed(2)}</span></div><div className="my-4 h-px bg-[#E8D8B8]" /><div className="flex justify-between text-2xl font-black"><span>Total</span><span>£{nfcTotal.toFixed(2)}</span></div><button onClick={() => openPayment("nfc")} disabled={!nfcItems.length} className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#FFC72C] px-5 py-4 font-black text-slate-950 shadow-md disabled:bg-slate-300"><WalletCards className="h-5 w-5" /> Pay tray basket</button></div>{nfcPaid && <div className="rounded-3xl border border-green-200 bg-green-50 p-4 text-green-800"><div className="flex items-center gap-2 font-black"><CheckCircle2 className="h-5 w-5" /> NFC tray payment complete</div><p className="mt-1 text-sm">Tray session NFC-A12 has been closed.</p></div>}
           </section>}
         </motion.div>
-        {screenData === "balance" && (
+        {screen === "balance" && (
   <section className="space-y-4">
 
     <div className="rounded-[2rem] bg-white p-6 shadow-sm">
@@ -477,18 +479,21 @@ export default function ImperialFoodWebpage() {
         <p className="text-sm opacity-80">Current Balance</p>
 
         <h1 className="mt-2 text-5xl font-black">
-          £100.00
-        </h1>
+  £{balance.toFixed(2)}
+</h1>
 
-        <button className="mt-6 rounded-full bg-[#FFC72C] px-5 py-3 font-black text-slate-950">
-          Top Up
-        </button>
+        <button
+  onClick={() => setShowTopUp(true)}
+  className="mt-6 rounded-full bg-[#FFC72C] px-5 py-3 font-black text-slate-950"
+>
+  Top Up
+</button>
       </div>
     </div>
 
   </section>
 )}
-{screenData === "history" && (
+{screen === "history" && (
   <section className="space-y-4">
 
     <div className="rounded-[2rem] bg-white p-6 shadow-sm">
@@ -503,9 +508,174 @@ export default function ImperialFoodWebpage() {
           <h3 className="font-black">2026 / 05 / 23</h3>
 
           <ul className="mt-3 space-y-2 text-sm">
-            <li>Chicken Katsu Curry — £8.50</li>
-            <li>Iced Matcha Latte — £4.20</li>
-            <li>Chocolate Cookie — £2.00</li>
+            <div className="rounded-2xl bg-white p-3">
+
+  <div className="flex items-center justify-between">
+
+    <div>
+      <p className="font-black">
+        Chicken Katsu Curry
+      </p>
+
+      <p className="text-sm text-slate-500">
+        £8.50
+      </p>
+    </div>
+
+    <div className="flex gap-2">
+
+      <button
+        onClick={() => {
+          setSelectedCommentMeal("Chicken Katsu Curry");
+          setShowCommentPopup(true);
+        }}
+        className="rounded-full bg-[#F5F7FA] px-3 py-2 text-xs font-black"
+      >
+        Comment
+      </button>
+
+      <button
+        onClick={() => {
+  if (likedMeals.includes("Chicken Katsu Curry")) {
+    setLikedMeals(
+      likedMeals.filter(
+        (meal) => meal !== "Chicken Katsu Curry"
+      )
+    );
+  } else {
+    setLikedMeals([
+      ...likedMeals,
+      "Chicken Katsu Curry"
+    ]);
+  }
+}}
+        className={`rounded-full px-3 py-2 text-xs font-black
+        ${
+          likedMeals.includes("Chicken Katsu Curry")
+            ? "bg-red-100 text-red-500"
+            : "bg-[#F5F7FA] text-slate-600"
+        }`}
+      >
+        ♥
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+            <div className="rounded-2xl bg-white p-3">
+
+  <div className="flex items-center justify-between">
+
+    <div>
+      <p className="font-black">
+        Iced Matcha Latte
+      </p>
+
+      <p className="text-sm text-slate-500">
+        £4.20
+      </p>
+    </div>
+
+    <div className="flex gap-2">
+
+      <button
+        onClick={() => {
+          setSelectedCommentMeal("Iced Matcha Latte");
+          setShowCommentPopup(true);
+        }}
+        className="rounded-full bg-[#F5F7FA] px-3 py-2 text-xs font-black"
+      >
+        Comment
+      </button>
+
+      <button
+        onClick={() => {
+  if (likedMeals.includes("Iced Matcha Latte")) {
+    setLikedMeals(
+      likedMeals.filter(
+        (meal) => meal !== "Iced Matcha Latte"
+      )
+    );
+  } else {
+    setLikedMeals([
+      ...likedMeals,
+      "Iced Matcha Latte"
+    ]);
+  }
+}}
+        className={`rounded-full px-3 py-2 text-xs font-black
+        ${
+          likedMeals.includes("Iced Matcha Latte")
+            ? "bg-red-100 text-red-500"
+            : "bg-[#F5F7FA] text-slate-600"
+        }`}
+      >
+        ♥
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+            <div className="rounded-2xl bg-white p-3">
+
+  <div className="flex items-center justify-between">
+
+    <div>
+      <p className="font-black">
+        Chocolate Cookie
+      </p>
+
+      <p className="text-sm text-slate-500">
+        £2.00
+      </p>
+    </div>
+
+    <div className="flex gap-2">
+
+      <button
+        onClick={() => {
+          setSelectedCommentMeal("Chocolate Cookie");
+          setShowCommentPopup(true);
+        }}
+        className="rounded-full bg-[#F5F7FA] px-3 py-2 text-xs font-black"
+      >
+        Comment
+      </button>
+
+      <button
+        onClick={() => {
+          if (likedMeals.includes("Chocolate Cookie")) {
+            setLikedMeals(
+              likedMeals.filter(
+                (meal) => meal !== "Chocolate Cookie"
+              )
+            );
+          } else {
+            setLikedMeals([
+              ...likedMeals,
+              "Chocolate Cookie"
+            ]);
+          }
+        }}
+        className={`rounded-full px-3 py-2 text-xs font-black
+        ${
+          likedMeals.includes("Chocolate Cookie")
+            ? "bg-red-100 text-red-500"
+            : "bg-[#F5F7FA] text-slate-600"
+        }`}
+      >
+        ♥
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
           </ul>
 
           <p className="mt-4 font-black text-[#003E74]">
@@ -517,12 +687,122 @@ export default function ImperialFoodWebpage() {
           <h3 className="font-black">2026 / 05 / 22</h3>
 
           <ul className="mt-3 space-y-2 text-sm">
-            <li>Spicy Beef Ramen — £9.20</li>
-            <li>Peach Soda — £2.80</li>
+            <div className="rounded-2xl bg-white p-3">
+
+  <div className="flex items-center justify-between">
+
+    <div>
+      <p className="font-black">
+        Spicy Beef Ramen
+      </p>
+
+      <p className="text-sm text-slate-500">
+        £9.20
+      </p>
+    </div>
+
+    <div className="flex gap-2">
+
+      <button
+        onClick={() => {
+          setSelectedCommentMeal("Spicy Beef Ramen");
+          setShowCommentPopup(true);
+        }}
+        className="rounded-full bg-[#F5F7FA] px-3 py-2 text-xs font-black"
+      >
+        Comment
+      </button>
+
+      <button
+        onClick={() => {
+          if (likedMeals.includes("Spicy Beef Ramen")) {
+            setLikedMeals(
+              likedMeals.filter(
+                (meal) => meal !== "Spicy Beef Ramen"
+              )
+            );
+          } else {
+            setLikedMeals([
+              ...likedMeals,
+              "Spicy Beef Ramen"
+            ]);
+          }
+        }}
+        className={`rounded-full px-3 py-2 text-xs font-black
+        ${
+          likedMeals.includes("Spicy Beef Ramen")
+            ? "bg-red-100 text-red-500"
+            : "bg-[#F5F7FA] text-slate-600"
+        }`}
+      >
+        ♥
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+            <div className="rounded-2xl bg-white p-3">
+
+  <div className="flex items-center justify-between">
+
+    <div>
+      <p className="font-black">
+        Peach Soda
+      </p>
+
+      <p className="text-sm text-slate-500">
+        £2.80
+      </p>
+    </div>
+
+    <div className="flex gap-2">
+
+      <button
+        onClick={() => {
+          setSelectedCommentMeal("Peach Soda");
+          setShowCommentPopup(true);
+        }}
+        className="rounded-full bg-[#F5F7FA] px-3 py-2 text-xs font-black"
+      >
+        Comment
+      </button>
+
+      <button
+        onClick={() => {
+          if (likedMeals.includes("Peach Soda")) {
+            setLikedMeals(
+              likedMeals.filter(
+                (meal) => meal !== "Peach Soda"
+              )
+            );
+          } else {
+            setLikedMeals([
+              ...likedMeals,
+              "Peach Soda"
+            ]);
+          }
+        }}
+        className={`rounded-full px-3 py-2 text-xs font-black
+        ${
+          likedMeals.includes("Peach Soda")
+            ? "bg-red-100 text-red-500"
+            : "bg-[#F5F7FA] text-slate-600"
+        }`}
+      >
+        ♥
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
           </ul>
 
           <p className="mt-4 font-black text-[#003E74]">
-            Total: £12.00
+            Total: £14.00
           </p>
         </div>
 
@@ -532,22 +812,71 @@ export default function ImperialFoodWebpage() {
 
   </section>
 )}
-{screenData === "favourite" && (
+{screen === "favourite" && (
   <section className="space-y-4">
 
     <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+
       <h2 className="text-3xl font-black text-[#003E74]">
         Favourite Meal
       </h2>
 
-      <p className="mt-4 text-slate-500">
-        Personalised recommendations coming soon.
-      </p>
+      {likedMeals.length === 0 ? (
+
+        <p className="mt-4 text-slate-500">
+          No favourite meals yet.
+        </p>
+
+      ) : (
+
+        <div className="mt-6 space-y-3">
+
+          {likedMeals.map((meal) => (
+
+            <div
+              key={meal}
+              className="flex items-center justify-between rounded-3xl bg-[#F8F5EE] p-4"
+            >
+
+              <div>
+                <p className="font-black">
+                  {meal}
+                </p>
+
+                <p className="text-sm text-slate-500">
+                  Saved favourite meal
+                </p>
+              </div>
+
+              <button
+                onClick={() =>
+                  addToCart({
+                    id: meal,
+                    name: meal,
+                    price: 8.5,
+                    prep: 10,
+                    image:
+                      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=600&auto=format&fit=crop",
+                  })
+                }
+                className="rounded-full bg-[#FFC72C] px-4 py-2 text-sm font-black"
+              >
+                Add to Cart
+              </button>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      )}
+
     </div>
 
   </section>
 )}
-      </AnimatePresence>
+        </AnimatePresence>
     </main>
     <div className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full border border-[#E8D8B8] bg-white/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
 
@@ -605,5 +934,146 @@ ${
     <AnimatePresence>{selectedArea && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-5 backdrop-blur-sm"><motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="w-full max-w-3xl rounded-[2rem] bg-white p-6 shadow-2xl"><div className="mb-5 flex items-start justify-between gap-4"><div><p className="text-sm font-black text-[#003E74]">Seat availability</p><h2 className="text-3xl font-black">{selectedArea.name}</h2><p className="mt-1 text-sm text-slate-500">{selectedArea.description} · {getAvailableSeats(selectedArea)} seats available</p></div><button onClick={() => setSelectedArea(null)} className="rounded-full border border-[#E8D8B8] p-2 hover:bg-[#F5F7FA]"><X className="h-5 w-5" /></button></div><SeatGrid area={selectedArea} /><button onClick={() => setSelectedArea(null)} className="mt-6 h-12 w-full rounded-full bg-[#FFC72C] font-black text-slate-950 hover:bg-[#E5A900]">Done</button></motion.div></motion.div>}</AnimatePresence>
 
     <AnimatePresence>{showPayment && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-5 backdrop-blur-sm"><motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-2xl"><div className="flex items-center justify-between"><div><p className="text-sm font-black text-[#003E74]">Test payment</p><h2 className="text-3xl font-black">Checkout</h2></div><div className="rounded-full bg-[#F5F7FA] p-3 text-[#003E74]"><Lock className="h-6 w-6" /></div></div><div className="mt-6 rounded-3xl bg-[#FFC72C] p-5 text-slate-950"><p className="text-sm text-slate-600">Imperial Food Card</p><p className="mt-6 text-xl font-black tracking-[0.25em]">4242 4242 4242 4242</p><div className="mt-5 flex justify-between text-sm"><span>TEST USER</span><span>12/30</span></div></div><div className="mt-5 space-y-3"><div className="flex justify-between text-sm"><span className="text-slate-500">Payment type</span><span className="font-black">{paymentMode === "nfc" ? "NFC tray" : "Online order"}</span></div><div className="flex justify-between text-sm"><span className="text-slate-500">Amount</span><span className="font-black">£{total.toFixed(2)}</span></div>{paymentMode === "online" && <div className="flex justify-between text-sm"><span className="text-slate-500">Reserved pickup</span><span className="font-black">Today {pickupTime}</span></div>}<div className="flex items-center gap-2 rounded-2xl bg-green-50 p-3 text-sm font-bold text-green-700"><ShieldCheck className="h-5 w-5" /> This is a simulated payment for testing only.</div></div><div className="mt-6 flex gap-3"><button onClick={() => setShowPayment(false)} className="h-12 flex-1 rounded-full border border-[#E8D8B8] font-black text-slate-700 hover:bg-[#F5F7FA]">Cancel</button><button onClick={completePayment} className="h-12 flex-1 rounded-full bg-[#FFC72C] font-black text-slate-950 hover:bg-[#E5A900]">Pay now</button></div></motion.div></motion.div>}</AnimatePresence>
+    <AnimatePresence>
+  {showTopUp && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-5 backdrop-blur-sm"
+    >
+      <motion.div
+        initial={{ scale: 0.95, y: 10 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.95, y: 10 }}
+        className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-2xl"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-black text-[#003E74]">
+              Account Top Up
+            </p>
+
+            <h2 className="text-3xl font-black">
+              Select amount
+            </h2>
+          </div>
+
+          <button
+            onClick={() => {
+              setShowTopUp(false);
+              setPendingTopUp(null);
+            }}
+            className="rounded-full border border-[#E8D8B8] p-2"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-3">
+
+          {[5,10,20,50,100,500].map((amount) => (
+            <button
+              key={amount}
+              onClick={() => setPendingTopUp(amount)}
+              className={`rounded-2xl border p-5 text-center font-black transition
+              ${
+                pendingTopUp === amount
+                  ? "border-[#FFC72C] bg-[#FFF7D8]"
+                  : "border-[#E8D8B8] bg-white hover:bg-[#F8F5EE]"
+              }`}
+            >
+              £{amount}
+            </button>
+          ))}
+
+        </div>
+
+        <button
+          disabled={!pendingTopUp}
+          onClick={() => {
+            setBalance(balance + pendingTopUp);
+            setShowTopUp(false);
+            setPendingTopUp(null);
+          }}
+          className="mt-6 w-full rounded-full bg-[#FFC72C] px-5 py-4 font-black text-slate-950 disabled:bg-slate-300"
+        >
+          Confirm Top Up
+        </button>
+
+      </motion.div>
+    </motion.div>
+  )}
+  <AnimatePresence>
+  {showCommentPopup && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-5 backdrop-blur-sm"
+    >
+      <motion.div
+        initial={{ scale: 0.95, y: 10 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.95, y: 10 }}
+        className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-2xl"
+      >
+
+        <div className="flex items-center justify-between">
+
+          <div>
+            <p className="text-sm font-black text-[#003E74]">
+              Review Meal
+            </p>
+
+            <h2 className="text-2xl font-black">
+              {selectedCommentMeal}
+            </h2>
+          </div>
+
+          <button
+            onClick={() => setShowCommentPopup(false)}
+            className="rounded-full border border-[#E8D8B8] p-2"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+        </div>
+
+        <div className="mt-6">
+          <p className="mb-3 text-sm font-black">
+            Rating
+          </p>
+
+          <StarRating
+            value={tempRating}
+            interactive
+            onChange={setTempRating}
+          />
+        </div>
+
+        <textarea
+          value={tempComment}
+          onChange={(e) => setTempComment(e.target.value)}
+          placeholder="Write your review..."
+          className="mt-5 min-h-32 w-full rounded-3xl border border-[#E8D8B8] p-4 outline-none focus:border-[#FFC72C]"
+        />
+
+        <button
+          onClick={() => {
+            setShowCommentPopup(false);
+            setTempComment("");
+            setTempRating(5);
+          }}
+          className="mt-6 w-full rounded-full bg-[#FFC72C] px-5 py-4 font-black text-slate-950"
+        >
+          Submit Review
+        </button>
+
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+</AnimatePresence>
   </div>;
 }
