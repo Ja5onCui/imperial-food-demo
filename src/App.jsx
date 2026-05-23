@@ -249,6 +249,8 @@ export default function ImperialFoodWebpage() {
   const [nfcPaid, setNfcPaid] = useState(false);
   const [showNfcConnect, setShowNfcConnect] = useState(false);
   const [trayBound, setTrayBound] = useState(false);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [screenData, setScreenData] = useState(null);
   const [localReviews, setLocalReviews] = useState({});
   const [reviewName, setReviewName] = useState("");
   const [reviewText, setReviewText] = useState("");
@@ -334,14 +336,60 @@ export default function ImperialFoodWebpage() {
   return <div className="min-h-screen bg-white text-slate-950">
     <header className="sticky top-0 z-30 border-b border-[#E8D8B8] bg-white/95 px-4 py-3 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between">
-        <div className="flex items-center gap-3">
-          {!isHome && <button onClick={back} className="rounded-full border border-[#E8D8B8] p-2"><ArrowLeft className="h-5 w-5" /></button>}
-          <div>
-            
-            <h1 className="tracking-[0.24em] text-xl font-black text-[#003E74]">IMPERIAL</h1>
-            <p className="text-xs font-black text-[#003E74]">{SCREEN_TITLES[screen]}</p>
-          </div>
-        </div>
+        <div className="relative flex items-center gap-3">
+
+  <div
+    className={`flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black transition-all
+    ${
+      trayBound
+        ? "bg-green-100 text-green-700 ring-2 ring-green-300"
+        : "bg-slate-100 text-slate-500"
+    }`}
+  >
+    <Nfc className="h-4 w-4" />
+    {trayBound ? "Tray Connected" : "No Tray"}
+  </div>
+
+  <button
+    onClick={() => setShowAccountMenu(!showAccountMenu)}
+    className="flex h-11 w-11 items-center justify-center rounded-full border border-[#E8D8B8] bg-white shadow-sm"
+  >
+    <User className="h-5 w-5 text-[#003E74]" />
+  </button>
+
+  {showAccountMenu && (
+    <div className="absolute right-0 top-14 z-50 w-72 rounded-3xl border border-[#E8D8B8] bg-white p-4 shadow-2xl">
+
+      <div className="space-y-3">
+
+        <button
+          onClick={() => setScreenData("balance")}
+          className="w-full rounded-2xl bg-[#F8F5EE] p-4 text-left transition hover:bg-[#EFE8D8]"
+        >
+          <h3 className="font-black text-[#003E74]">Account Balance</h3>
+          <p className="mt-1 text-sm text-slate-500">Current balance and top-up</p>
+        </button>
+
+        <button
+          onClick={() => setScreenData("history")}
+          className="w-full rounded-2xl bg-[#F8F5EE] p-4 text-left transition hover:bg-[#EFE8D8]"
+        >
+          <h3 className="font-black text-[#003E74]">Purchase History</h3>
+          <p className="mt-1 text-sm text-slate-500">Recent dining activity</p>
+        </button>
+
+        <button
+          onClick={() => setScreenData("favourite")}
+          className="w-full rounded-2xl bg-[#F8F5EE] p-4 text-left transition hover:bg-[#EFE8D8]"
+        >
+          <h3 className="font-black text-[#003E74]">Favourite Meal</h3>
+          <p className="mt-1 text-sm text-slate-500">Personal recommendations</p>
+        </button>
+
+      </div>
+    </div>
+  )}
+</div>
         <div className="flex items-center gap-3">
 
   <div
@@ -375,6 +423,7 @@ export default function ImperialFoodWebpage() {
 
     <main className="mx-auto max-w-5xl p-4 pb-32">
       <AnimatePresence mode="wait">
+        
         <motion.div key={screen} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.18 }}>
           
 
@@ -416,6 +465,88 @@ export default function ImperialFoodWebpage() {
             <div className="rounded-3xl bg-[#F5F7FA] p-4"><div className="flex justify-between text-sm text-slate-600"><span>Detection mode</span><span className="font-black text-slate-950">NFC / QR backup</span></div><div className="mt-2 flex justify-between text-sm text-slate-600"><span>Subtotal</span><span className="font-black text-slate-950">£{nfcTotal.toFixed(2)}</span></div><div className="my-4 h-px bg-[#E8D8B8]" /><div className="flex justify-between text-2xl font-black"><span>Total</span><span>£{nfcTotal.toFixed(2)}</span></div><button onClick={() => openPayment("nfc")} disabled={!nfcItems.length} className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#FFC72C] px-5 py-4 font-black text-slate-950 shadow-md disabled:bg-slate-300"><WalletCards className="h-5 w-5" /> Pay tray basket</button></div>{nfcPaid && <div className="rounded-3xl border border-green-200 bg-green-50 p-4 text-green-800"><div className="flex items-center gap-2 font-black"><CheckCircle2 className="h-5 w-5" /> NFC tray payment complete</div><p className="mt-1 text-sm">Tray session NFC-A12 has been closed.</p></div>}
           </section>}
         </motion.div>
+        {screenData === "balance" && (
+  <section className="space-y-4">
+
+    <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+      <h2 className="text-3xl font-black text-[#003E74]">
+        Account Balance
+      </h2>
+
+      <div className="mt-6 rounded-3xl bg-[#003E74] p-6 text-white">
+        <p className="text-sm opacity-80">Current Balance</p>
+
+        <h1 className="mt-2 text-5xl font-black">
+          £100.00
+        </h1>
+
+        <button className="mt-6 rounded-full bg-[#FFC72C] px-5 py-3 font-black text-slate-950">
+          Top Up
+        </button>
+      </div>
+    </div>
+
+  </section>
+)}
+{screenData === "history" && (
+  <section className="space-y-4">
+
+    <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+
+      <h2 className="text-3xl font-black text-[#003E74]">
+        Purchase History
+      </h2>
+
+      <div className="mt-6 space-y-5">
+
+        <div className="rounded-3xl bg-[#F8F5EE] p-5">
+          <h3 className="font-black">2026 / 05 / 23</h3>
+
+          <ul className="mt-3 space-y-2 text-sm">
+            <li>Chicken Katsu Curry — £8.50</li>
+            <li>Iced Matcha Latte — £4.20</li>
+            <li>Chocolate Cookie — £2.00</li>
+          </ul>
+
+          <p className="mt-4 font-black text-[#003E74]">
+            Total: £14.70
+          </p>
+        </div>
+
+        <div className="rounded-3xl bg-[#F8F5EE] p-5">
+          <h3 className="font-black">2026 / 05 / 22</h3>
+
+          <ul className="mt-3 space-y-2 text-sm">
+            <li>Spicy Beef Ramen — £9.20</li>
+            <li>Peach Soda — £2.80</li>
+          </ul>
+
+          <p className="mt-4 font-black text-[#003E74]">
+            Total: £12.00
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+)}
+{screenData === "favourite" && (
+  <section className="space-y-4">
+
+    <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+      <h2 className="text-3xl font-black text-[#003E74]">
+        Favourite Meal
+      </h2>
+
+      <p className="mt-4 text-slate-500">
+        Personalised recommendations coming soon.
+      </p>
+    </div>
+
+  </section>
+)}
       </AnimatePresence>
     </main>
     <div className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full border border-[#E8D8B8] bg-white/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
