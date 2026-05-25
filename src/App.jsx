@@ -255,6 +255,7 @@ export default function ImperialFoodWebpage() {
   const [reviewName, setReviewName] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
+  const [showAddedToast, setShowAddedToast] = useState(false);
   const [balance, setBalance] = useState(100);
   const [showTopUp, setShowTopUp] = useState(false);
   const [pendingTopUp, setPendingTopUp] = useState(null);
@@ -441,7 +442,15 @@ export default function ImperialFoodWebpage() {
               <div className="flex items-center justify-between gap-3"><div><h2 className="text-2xl font-black">{selected.name}</h2><p className="text-sm text-slate-500">{selected.tags.join(" · ")} · {selected.wait} min</p></div><button onClick={() => go("onlineRatings")} className="rounded-full bg-[#F5F7FA] px-4 py-2 text-sm font-black"><MessageSquare className="mr-1 inline h-4 w-4" />Ratings</button></div>
               <div className="relative mt-4"><Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search dishes..." className="h-12 w-full rounded-full border border-[#E8D8B8] bg-[#F5F7FA] pl-11 pr-4 text-sm outline-none focus:border-[#FFC72C]" /></div>
             </div>
-            <div className="grid gap-4 md:grid-cols-2">{selectedMenu.map((item) => <MenuItem key={item.id} item={item} onAdd={(dish) => { addToCart(dish); go("onlineCart"); }} />)}</div>
+            <div className="grid gap-4 md:grid-cols-2">{selectedMenu.map((item) => <MenuItem key={item.id} item={item} onAdd={(dish) => {
+  addToCart(dish);
+
+  setShowAddedToast(true);
+
+  setTimeout(() => {
+    setShowAddedToast(false);
+  }, 1800);
+}} />)}</div>
           </section>}
 
           {screen === "onlineRatings" && <section className="space-y-4">
@@ -1073,6 +1082,26 @@ ${
       </motion.div>
     </motion.div>
   )}
+  <AnimatePresence>
+  {showAddedToast && (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      className="fixed bottom-28 left-1/2 z-[120] -translate-x-1/2"
+    >
+      <div className="flex items-center gap-3 rounded-full bg-[#003E74] px-5 py-3 text-white shadow-2xl">
+
+        <CheckCircle2 className="h-5 w-5 text-[#FFC72C]" />
+
+        <p className="text-sm font-black">
+          Added to Cart
+        </p>
+
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
 </AnimatePresence>
 </AnimatePresence>
   </div>;
