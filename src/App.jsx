@@ -430,7 +430,145 @@ export default function ImperialFoodWebpage() {
         <motion.div key={screen} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.18 }}>
           
 
-          {screen === "onlineSeats" && <section className="grid gap-4 md:grid-cols-2">{seatingAreas.map((area) => <SeatCard key={area.id} area={area} onClick={() => setSelectedArea(area)} />)}</section>}
+          {screen === "onlineSeats" && (
+  <section className="space-y-5">
+
+    <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+
+      <div className="flex items-center justify-between">
+
+        <div>
+          <h2 className="text-3xl font-black text-[#003E74]">
+            Live Seat Availability
+          </h2>
+
+          <p className="mt-1 text-slate-500">
+            Current seating conditions across dining areas.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div className="grid gap-5 md:grid-cols-2">
+
+      <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm">
+        <img
+          src="/seat-area-a.jpeg"
+          alt="Area A"
+          className="h-64 w-full object-cover"
+        />
+
+        <div className="p-5">
+          <div className="flex items-center justify-between">
+
+            <div>
+              <h3 className="text-2xl font-black">
+                Lounge Seating
+              </h3>
+
+              <p className="text-slate-500">
+                Comfortable sofa area
+              </p>
+            </div>
+
+            <div className="rounded-full bg-green-100 px-4 py-2 text-sm font-black text-green-700">
+              Available
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm">
+        <img
+          src="/seat-area-b.jpeg"
+          alt="Area B"
+          className="h-64 w-full object-cover"
+        />
+
+        <div className="p-5">
+          <div className="flex items-center justify-between">
+
+            <div>
+              <h3 className="text-2xl font-black">
+                Communal Tables
+              </h3>
+
+              <p className="text-slate-500">
+                Shared dining tables
+              </p>
+            </div>
+
+            <div className="rounded-full bg-yellow-100 px-4 py-2 text-sm font-black text-yellow-700">
+              Busy
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm">
+        <img
+          src="/seat-area-c.jpeg"
+          alt="Area C"
+          className="h-64 w-full object-cover"
+        />
+
+        <div className="p-5">
+          <div className="flex items-center justify-between">
+
+            <div>
+              <h3 className="text-2xl font-black">
+                High Seating
+              </h3>
+
+              <p className="text-slate-500">
+                Fast dining area
+              </p>
+            </div>
+
+            <div className="rounded-full bg-red-100 px-4 py-2 text-sm font-black text-red-700">
+              Full
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-[2rem] bg-white shadow-sm">
+        <img
+          src="/seat-area-d.jpeg"
+          alt="Area D"
+          className="h-64 w-full object-cover"
+        />
+
+        <div className="p-5">
+          <div className="flex items-center justify-between">
+
+            <div>
+              <h3 className="text-2xl font-black">
+                Round Tables
+              </h3>
+
+              <p className="text-slate-500">
+                Social dining space
+              </p>
+            </div>
+
+            <div className="rounded-full bg-green-100 px-4 py-2 text-sm font-black text-green-700">
+              Available
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+)}
 
           {screen === "onlineShops" && <section className="space-y-4">
             <div className="flex items-center justify-between"><div><h2 className="text-2xl font-black">Choose a shop</h2><p className="text-sm text-slate-500">Tap a shop to open its menu.</p></div><button onClick={() => setSort(sort === "wait" ? "rating" : "wait")} className="rounded-full bg-[#F5F7FA] px-3 py-2 text-xs font-black"><SlidersHorizontal className="mr-1 inline h-4 w-4" />{sort === "wait" ? "Time" : "Rating"}</button></div>
